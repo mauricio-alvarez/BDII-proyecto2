@@ -25,7 +25,7 @@ def saveDict(diccionario, nombre_archivo, formato):
             print("Formato no válido. Debe ser 'texto' o 'binario'.")
             return
 
-        print("Diccionario guardado exitosamente en el archivo:", nombre_archivo)
+        print("Diccionario guardado exitosamente en el archivo:", nombre_archivo, "len: ", len(diccionario))
     except IOError:
         print("Error al guardar el diccionario en el archivo:", nombre_archivo)
 def loadDict(nombre_archivo, formato):
@@ -48,32 +48,36 @@ def loadDict(nombre_archivo, formato):
     except IOError:
         print("Error al cargar el diccionario desde el archivo:", nombre_archivo)
         return None
-def preProcessing(texto):
+def loadStopList(archivo):
+    stoplist = {".":True, ",":True, ";":True, ":":True, "(":True, ")":True, "=":True, "@":True, "+":True, "-":True, "_":True, "*":True, "¿":True, "?":True, "/":True, "&":True, "%":True, "!":True, "\\":True,"--":True,
+                "<":True, ">":True, '$':True, "{":True, "}":True}
+    with open(archivo, "r", encoding="utf-8") as file:
+        for palabra in file:
+            palabra = palabra.strip()  # Eliminar espacios en blanco y saltos de línea adicionales
+            stoplist[palabra] = True
+    return stoplist
+def preProcessing(texto, stoplist):
     #Tokenizar
     texto = ' '.join(texto)
     list = nltk.word_tokenize(texto.lower())
 
-    #Filtrar stopwords
-    with open("stoplist-en.txt", "r", encoding="utf-8") as file:
-        stoplist = [line.rstrip() for line in file.readlines()]
-    signos = [".", ",", ";", ":", "(", ")", "=", "@", "+", "-", "_", "*", "¿", "?", "/", "&", "%", "!"]
-    list = [x for x in list if x not in stoplist]
-    list = [x for x in list if x not in signos]
-
-    #Reducir palabras
     stemmer = SnowballStemmer("english")
-    list = [stemmer.stem(palabra) for palabra in list]
+    result = []
+    #Filtrar stopwords
+    for x in list:
+        if (x not in stoplist and len(x) > 3):
+            result.append(stemmer.stem(x))
 
-    return list
-
+    return result
 def indexNewDocuments(file, dictDoc, dictWord):
     counter=0
-    with open(file, 'r') as file:
+    stoplist = loadStopList("stoplist-en.txt")
+    with open(file, 'r', encoding="utf-8") as file:
         for line in file:
             article = json.loads(line)
             inicio = time.time()
             counter+=1
-            keyWord = preProcessing(   [  article['title'],   article['abstract']   ]  )
+            keyWord = preProcessing(   [  article['title'],   article['abstract']   ], stoplist)
             dictDoc[article['id']] = len(dictDoc)+1
             ite = set(keyWord)
             for word in list(ite):
@@ -84,25 +88,23 @@ def indexNewDocuments(file, dictDoc, dictWord):
                     dictWord[word] = (current[0], (current[1]++1))
                     nameFile = "indexData/" + str(current[0]) + ".txt"
                     try:
-
                         indexFile = open(nameFile, "a")
                         tf = sum(1 for item in keyWord if item == word)
-                        data = struct.pack("II", len(dictDoc) + 1, tf)
-                        indexFile.write(str(len(dictDoc) + 1) + " " + str(tf))
+                        data = struct.pack("II", len(dictDoc), tf)
+                        indexFile.write(str(len(dictDoc)) + " " + str(tf)+",")
                         indexFile.close()
                     except IOError:
-                        print("Error al abrir el archivo:", "indexData/"+str(current[0])+".txt")
+                        print("Error al abrir el archivo:", nameFile)
                 else:
                     #La palabra es nueva en el diciconario
                     #Se anade un nuevo valor al diccionario
                     dictWord[word] = (len(dictWord) + 1, 1)
-                    nameFile = "indexData/" + str(len(dictWord) + 1) + ".txt"
+                    nameFile = "indexData/" + str(len(dictWord)) + ".txt"
                     try:
-
                         indexFile = open(nameFile, "w")
                         tf = sum(1 for item in keyWord if item == word)
-                        data = struct.pack("II", len(dictDoc) + 1, tf)
-                        indexFile.write(str(len(dictDoc) + 1) + " " + str(tf))
+                        data = struct.pack("II", len(dictDoc), tf)
+                        indexFile.write(str(len(dictDoc)) + " " + str(tf)+",")
                         indexFile.close()
                     except IOError:
                         print("Error al crear el archivo:", nameFile)
@@ -112,6 +114,20 @@ def indexNewDocuments(file, dictDoc, dictWord):
 
     file.close()
 
+def test(file):
+    sum = 0
+    sumlist = []
+    stoplist = loadStopList("stoplist-en.txt")
+    with open(file, 'r', encoding="utf-8") as file:
+        for line in file:
+            article = json.loads(line)
+            inicio = time.time()
+            keyWord = preProcessing([article['title'], article['abstract']], stoplist)
+            sum+=len(keyWord)
+            sumlist += keyWord
+            print(keyWord)
+    print(sum)
+    print(len(set(sumlist)))
 
 dictWords = {}
 dictDocs = {}
@@ -122,6 +138,10 @@ dictWords = loadDict("dictWord.txt","texto")
 dictDocs = loadDict("dictDocs.txt","texto")
 
 
-indexNewDocuments('arxiv-metadata-oai-snapshot.json',dictDocs, dictWords)
+
+indexNewDocuments('part1.json',dictDocs, dictWords)
 saveDict(dictWords, "dictWord.txt","texto")
 saveDict(dictDocs, "dictDocs.txt","texto")
+
+
+#test("part1.json")
