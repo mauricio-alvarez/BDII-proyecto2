@@ -44,8 +44,7 @@ def loadDict(nombre_archivo, formato):
         print("Error al cargar el diccionario desde el archivo:", nombre_archivo)
         return None
 def loadStopList(archivo):
-    stoplist = {".":True, ",":True, ";":True, ":":True, "(":True, ")":True, "=":True, "@":True, "+":True, "-":True, "_":True, "*":True, "¿":True, "?":True, "/":True, "&":True, "%":True, "!":True, "\\":True,"--":True,
-                "<":True, ">":True, '$':True, "{":True, "}":True}
+    stoplist = dict()
     with open(archivo, "r", encoding="utf-8") as file:
         for palabra in file:
             palabra = palabra.strip()  # Eliminar espacios en blanco y saltos de línea adicionales
@@ -61,7 +60,12 @@ def preProcessing(texto, stoplist):
     #Filtrar stopwords
     for x in list:
         if (x not in stoplist and len(x) > 3):
-            result.append(stemmer.stem(x))
+            try:
+                float(stemmer.stem(x))
+                pass
+            except ValueError:
+                result.append(stemmer.stem(x))
+
 
     return result
 def getFrecuency(lista):
@@ -135,7 +139,7 @@ def test(file):
         for line in file:
             article = json.loads(line)
             inicio = time.time()
-            sum2 = sum2 + len(article['title']) + len(article['abstract']);
+            sum2 = sum2 + len(article['title']) + len(article['abstract'])
             keyWord = preProcessing([article['title'], article['abstract']], stoplist)
             sum+=len(keyWord)
             sumlist += keyWord
