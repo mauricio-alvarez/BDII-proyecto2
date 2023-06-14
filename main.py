@@ -14,13 +14,11 @@ from nltk.stem.porter import *
 def saveDict(diccionario, nombre_archivo, formato):
     try:
         if formato == "texto":
-            with open(nombre_archivo, "w") as archivo:
-                for clave, valor in diccionario.items():
-                    linea = f"{clave}: {valor}\n"
-                    archivo.write(linea)
+            with open(nombre_archivo, 'w') as f:
+                json.dump(diccionario, f)
         elif formato == "binario":
-            with open(nombre_archivo, "wb") as archivo:
-                pickle.dump(diccionario, archivo)
+            with open(nombre_archivo, 'wb') as f:
+                json.dump(diccionario, f)
         else:
             print("Formato no válido. Debe ser 'texto' o 'binario'.")
             return
@@ -31,14 +29,11 @@ def saveDict(diccionario, nombre_archivo, formato):
 def loadDict(nombre_archivo, formato):
     try:
         if formato == "texto":
-            with open(nombre_archivo, "r") as archivo:
-                diccionario = {}
-                for linea in archivo:
-                    clave, valor = linea.strip().split(":")
-                    diccionario[clave.strip()] = valor.strip()
+            with open(nombre_archivo, 'r') as f:
+                diccionario = json.load(f)
         elif formato == "binario":
-            with open(nombre_archivo, "rb") as archivo:
-                diccionario = pickle.load(archivo)
+            with open(nombre_archivo, 'rb') as f:
+                diccionario = json.load(f)
         else:
             print("Formato no válido. Debe ser 'texto' o 'binario'.")
             return None
@@ -69,17 +64,34 @@ def preProcessing(texto, stoplist):
             result.append(stemmer.stem(x))
 
     return result
+def getFrecuency(lista):
+    conteo = {}
+    for palabra in lista:
+        if palabra in conteo:
+            conteo[palabra] += 1
+        else:
+            conteo[palabra] = 1
+    return conteo
 def indexNewDocuments(file, dictDoc, dictWord):
-    counter=0
     stoplist = loadStopList("stoplist-en.txt")
+
     with open(file, 'r', encoding="utf-8") as file:
-        for line in file:
+        errores = 0
+        terminosProcesados = 0
+        position = 0
+        for counter,line in enumerate(file):
+
             article = json.loads(line)
+            #print("Pos: ", posicion)
             inicio = time.time()
-            counter+=1
             keyWord = preProcessing(   [  article['title'],   article['abstract']   ], stoplist)
-            dictDoc[article['id']] = len(dictDoc)+1
+            #dictDoc[article['id']] = len(dictDoc)+1
+
+            dictDoc[len(dictDoc)+1] = (article['id'],position)
+            frecuencias = getFrecuency(keyWord)
+            terminosProcesados+=len(keyWord)
             ite = set(keyWord)
+            #Guardar cada Keyword en el memoria secundaria
             for word in list(ite):
                 if(word in dictWord):
                     #La palabra ya existe en el diccionario
@@ -89,11 +101,10 @@ def indexNewDocuments(file, dictDoc, dictWord):
                     nameFile = "indexData/" + str(current[0]) + ".txt"
                     try:
                         indexFile = open(nameFile, "a")
-                        tf = sum(1 for item in keyWord if item == word)
-                        data = struct.pack("II", len(dictDoc), tf)
-                        indexFile.write(str(len(dictDoc)) + " " + str(tf)+",")
+                        indexFile.write(str(len(dictDoc)) + "," + str(frecuencias[word])+";")
                         indexFile.close()
                     except IOError:
+                        errores += 1
                         print("Error al abrir el archivo:", nameFile)
                 else:
                     #La palabra es nueva en el diciconario
@@ -102,30 +113,34 @@ def indexNewDocuments(file, dictDoc, dictWord):
                     nameFile = "indexData/" + str(len(dictWord)) + ".txt"
                     try:
                         indexFile = open(nameFile, "w")
-                        tf = sum(1 for item in keyWord if item == word)
-                        data = struct.pack("II", len(dictDoc), tf)
-                        indexFile.write(str(len(dictDoc)) + " " + str(tf)+",")
+                        indexFile.write(str(len(dictDoc)) + "," + str(frecuencias[word])+";")
                         indexFile.close()
                     except IOError:
+                        errores+=1
                         print("Error al crear el archivo:", nameFile)
-            fin = time.time()
-            tiempo_ejecucion = fin - inicio
+            tiempo_ejecucion = time.time() - inicio
             print(f"Se ha cargado: '{article['id']}, correctamente en {tiempo_ejecucion:.6f} segundos. #{counter}")
+            position+=len(line)
+            print("Pos: ", position)
 
-    file.close()
+    print(f"Se ha procesado: {terminosProcesados} palabras durante esta indexacion.")
+    print(f"Durante la ejecuccion se anoto: {errores} errores.")
 
 def test(file):
     sum = 0
+    sum2 = 0
     sumlist = []
     stoplist = loadStopList("stoplist-en.txt")
     with open(file, 'r', encoding="utf-8") as file:
         for line in file:
             article = json.loads(line)
             inicio = time.time()
+            sum2 = sum2 + len(article['title']) + len(article['abstract']);
             keyWord = preProcessing([article['title'], article['abstract']], stoplist)
             sum+=len(keyWord)
             sumlist += keyWord
             print(keyWord)
+    print(sum2)
     print(sum)
     print(len(set(sumlist)))
 
@@ -136,7 +151,6 @@ saveDict(dictDocs, "dictDocs.txt","texto")
 
 dictWords = loadDict("dictWord.txt","texto")
 dictDocs = loadDict("dictDocs.txt","texto")
-
 
 
 indexNewDocuments('part1.json',dictDocs, dictWords)
