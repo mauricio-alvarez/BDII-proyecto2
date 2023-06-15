@@ -1,6 +1,8 @@
 import nltk
+import numpy as np
 from nltk.corpus import stopwords
-from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.feature_extraction.text import TfidfVectorizer, CountVectorizer
+from sklearn.metrics.pairwise import linear_kernel
 
 nltk.download('stopwords')
 nltk.download('punkt')
@@ -43,7 +45,10 @@ def serach_document(query_read):
 
 
 # Sacar Tfidf de los documentos los cuales debemos mostrar
-def sort_document(documents):
+def sort_document(documents, query):
     tr_idf_model = TfidfVectorizer()
     tf_idf_vector = tr_idf_model.fit_transform(documents)
-    return tf_idf_vector
+    vectorizer = TfidfVectorizer()
+    tf_ = vectorizer.transform(query)
+    cosine_similary = linear_kernel(tf_idf_vector, tf_)
+    return cosine_similary
