@@ -107,6 +107,13 @@ class Ui_Query(object):
         self.postgres_title.setText(_translate("MainWindow", "Using PostgreSQL - Top K"))
         self.python_title.setText(_translate("MainWindow", "Using Python - Top K"))
 
+    def addElementsSQL(self, result):
+        for n, res in enumerate(result):
+            if n < 10:
+                temp = QtWidgets.QLabel(parent=self.centralwidget)
+                temp.setText(str(res))
+                self.postgres_layout.addWidget(temp)
+            print(n, res)
 
 if __name__ == "__main__":
     import sys
