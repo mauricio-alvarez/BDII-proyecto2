@@ -82,10 +82,10 @@ class Recovery:
         model_fit = TfidfVectorizer()
         tf_idf_vector = model_fit.fit_transform(documents)
         tf_ = model_fit.transform([self.query])
-        cosine_similary = cosine_similarity(tf_, tf_idf_vector)
+        cosine_similary = cosine_similarity(tf_idf_vector, tf_)
         cosine_similary_final = []
         for i in range(len(indices)):
-            cosine_similary_final.append((cosine_similary[0][i], jsonpos[i]))
+            cosine_similary_final.append((cosine_similary[i][0], jsonpos[i]))
         cosine_similary_final.sort(key=lambda x: x[0], reverse=True)
         return cosine_similary_final
 
