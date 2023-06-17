@@ -114,7 +114,7 @@ class Spimi():
                         nameFile = "indexData/" + str(current[0]) + ".txt"
                         try:
                             indexFile = open(nameFile, "a")
-                            indexFile.write(str(len(self.dictDoc)) + "," + str(frecuencias[word])+";")
+                            indexFile.write(str(len(self.dictDoc)) + ",")
                             indexFile.close()
                         except IOError:
                             errores += 1
@@ -126,7 +126,7 @@ class Spimi():
                         nameFile = "indexData/" + str(len(self.dictWord)) + ".txt"
                         try:
                             indexFile = open(nameFile, "w")
-                            indexFile.write(str(len(self.dictDoc)) + "," + str(frecuencias[word])+";")
+                            indexFile.write(str(len(self.dictDoc)) + ",")
                             indexFile.close()
                         except IOError:
                             errores+=1
@@ -135,6 +135,9 @@ class Spimi():
                 print(f"Se ha cargado: '{article['id']}, correctamente en {tiempo_ejecucion:.6f} segundos. #{counter}")
                 position+=len(line)
                 print("Pos: ", position)
+                if(counter == 1000000):
+                    print("Se termino de procesar")
+                    break
 
         print(f"Se ha procesado: {terminosProcesados} palabras durante esta indexacion.")
         print(f"Durante la ejecuccion se anoto: {errores} errores.")
