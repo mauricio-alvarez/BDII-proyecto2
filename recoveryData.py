@@ -41,29 +41,35 @@ class Recovery:
         return result
 
     def getDocuments(self, pos):
-        file = open('indexData/' + pos + '.txt')
+        file = open('indexData/' + str(pos) + '.txt')
         text = file.readline()
         result = text.split(',')
-        return result
+        return result[:-1]
 
     def serach_document(self, query_read):
         Yes_documents = []
         No_documents = []
+
         for key, value in query_read.items():
             if value:
-                temp = self.getDocuments(main.dictWords[key][0])
-                Yes_documents.append(x for x in temp)
+                temp = self.getDocuments(dictWords[key][0])
+                Yes_documents = Yes_documents + temp
+
             else:
-                temp = self.getDocuments(main.dictWords[key][0])
-                No_documents.append(x for x in temp)
+                temp = self.getDocuments(dictWords[key][0])
+                No_documents = No_documents + temp
+
         result = [x for x in Yes_documents if x not in No_documents]
         # devuelve que documentos debemos
+
         return result
 
     # Sacar Tfidf de los documentos los cuales debemos mostrar
     def sort_document(self, indices):
         documents = []
+        print(indices)
         for x in indices:
+
             temp = dictDocs[x][1]
             file = open('part1.json', 'rb')
             file.seek(temp + 1) if x != 0 else file.seek(temp)
