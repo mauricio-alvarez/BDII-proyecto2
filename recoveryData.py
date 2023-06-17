@@ -67,7 +67,7 @@ class Recovery:
     # Sacar Tfidf de los documentos los cuales debemos mostrar
     def sort_document(self, indices):
         documents = []
-        print(indices)
+        
         for x in indices:
 
             temp = dictDocs[x][1]
