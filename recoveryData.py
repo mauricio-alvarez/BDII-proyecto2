@@ -4,6 +4,7 @@ from nltk.corpus import stopwords
 from sklearn.feature_extraction.text import TfidfVectorizer, CountVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 import main
+
 nltk.download('stopwords')
 nltk.download('punkt')
 
@@ -51,12 +52,17 @@ class Recovery:
         No_documents = []
         for key, value in query_read.items():
             if value:
-                temp = self.getDocuments(main.dictWords[key][0])
-                Yes_documents.append(int(x) for x in temp)
-
+                try:
+                    temp = self.getDocuments(main.dictWords[key][0])
+                    Yes_documents += temp
+                except:
+                    continue
             else:
-                temp = self.getDocuments(main.dictWords[key][0])
-                No_documents.append(int(x) for x in temp)
+                try:
+                    temp = self.getDocuments(main.dictWords[key][0])
+                    No_documents += temp
+                except:
+                    continue
         result = [x for x in Yes_documents if x not in No_documents]
         # devuelve que documentos debemos
 
