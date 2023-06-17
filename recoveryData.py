@@ -52,12 +52,12 @@ class Recovery:
 
         for key, value in query_read.items():
             if value:
-                temp = self.getDocuments(dictWords[key][0])
-                Yes_documents = Yes_documents + temp
+                temp = self.getDocuments(main.dictWords[key][0])
+                Yes_documents.append(int(x) for x in temp)
 
             else:
-                temp = self.getDocuments(dictWords[key][0])
-                No_documents = No_documents + temp
+                temp = self.getDocuments(main.dictWords[key][0])
+                No_documents.append(int(x) for x in temp)
 
         result = [x for x in Yes_documents if x not in No_documents]
         # devuelve que documentos debemos
@@ -67,10 +67,10 @@ class Recovery:
     # Sacar Tfidf de los documentos los cuales debemos mostrar
     def sort_document(self, indices):
         documents = []
-        
+        jsonpos = []
         for x in indices:
-
-            temp = dictDocs[x][1]
+            temp = main.dictDocs[x][1]
+            jsonpos.append(temp)
             file = open('part1.json', 'rb')
             file.seek(temp + 1) if x != 0 else file.seek(temp)
             contenido = str(file.readline().decode('utf-8'))
@@ -81,7 +81,7 @@ class Recovery:
         cosine_similary = cosine_similarity(tf_, tf_idf_vector)
         cosine_similary_final = []
         for i in range(len(indices)):
-            cosine_similary_final.append((cosine_similary[0][i], indices[i]))
+            cosine_similary_final.append((cosine_similary[0][i], jsonpos[i]))
         cosine_similary_final.sort(key=lambda x: x[0], reverse=True)
         return cosine_similary_final
 
