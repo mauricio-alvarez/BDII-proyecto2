@@ -1,8 +1,7 @@
 import nltk
-import numpy as np
 from nltk.corpus import stopwords
 from sklearn.feature_extraction.text import TfidfVectorizer, CountVectorizer
-from sklearn.metrics.pairwise import linear_kernel
+from sklearn.metrics.pairwise import cosine_similarity
 
 nltk.download('stopwords')
 nltk.download('punkt')
@@ -48,17 +47,22 @@ def serach_document(query_read):
 def sort_document(indices, query):
     documents = []
     print(indices)
-    indices = [1079, 0, 43391]
+    print(indices)
     for x in indices:
-        #temp = dictDocs[x][1]
+        temp = dictDocs[x][1]
         file = open('part1.json', 'rb')
-        file.seek(x+2) if x != 0 else file.seek(x)
-        contenido = file.readline().decode('utf-8')
+        file.seek(x + 1) if x != 0 else file.seek(x)
+        contenido = str(file.readline().decode('utf-8'))
         documents.append(contenido)
-    tr_idf_model = TfidfVectorizer()
-    tf_idf_vector = tr_idf_model.fit_transform(documents)
-    vectorizer = TfidfVectorizer()
-
-    tf_ = vectorizer.transform([query])
-    cosine_similary = linear_kernel(tf_idf_vector, tf_)
-    return cosine_similary
+    print(documents)
+    model_fit = TfidfVectorizer()
+    aux = TfidfVectorizer()
+    model_fit.fit(documents)
+    tf_idf_vector = aux.fit_transform(documents)
+    tf_ = model_fit.transform([query])
+    cosine_similary = cosine_similarity(tf_, tf_idf_vector)
+    cosine_similary_final = []
+    for i in range(len(indices)):
+        cosine_similary_final.append((cosine_similary[i], indices[i]))
+    sorted(cosine_similary_final, reverse=True)
+    return cosine_similary_final
