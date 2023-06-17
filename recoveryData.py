@@ -49,7 +49,6 @@ class Recovery:
     def serach_document(self, query_read):
         Yes_documents = []
         No_documents = []
-
         for key, value in query_read.items():
             if value:
                 temp = self.getDocuments(main.dictWords[key][0])
