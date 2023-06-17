@@ -73,7 +73,7 @@ class Recovery:
         documents = []
         jsonpos = []
         for x in indices:
-            temp = main.dictDocs[x][1]
+            temp = main.dictDocs[str(x)][1]
             jsonpos.append(temp)
             file = open('part1.json', 'rb')
             file.seek(temp + 1) if x != 0 else file.seek(temp)
