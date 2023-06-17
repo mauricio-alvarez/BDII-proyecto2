@@ -3,7 +3,7 @@ from nltk.stem.snowball import SnowballStemmer
 from nltk.corpus import stopwords
 from sklearn.feature_extraction.text import TfidfVectorizer, CountVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
-
+import main
 nltk.download('stopwords')
 nltk.download('punkt')
 
@@ -19,6 +19,10 @@ class Recovery:
         query = self.query.split()
         stop_words = set(stopwords.words('english'))
         stop_words.discard('no')
+        stop_words.discard('don´t')
+        stop_words.discard('doesn´t')
+        stop_words.discard('didn´t')
+        stop_words.discard('dont')
         stop_words = [*stop_words]
         query_evaluate = [x for x in query if x not in stop_words]
         if len(query_evaluate) == 0:
@@ -36,14 +40,22 @@ class Recovery:
         # Retorna la query desenpaquetada
         return result
 
+    def getDocuments(self, pos):
+        file = open('indexData/' + pos + '.txt')
+        text = file.readline()
+        result = text.split(',')
+        return result
+
     def serach_document(self, query_read):
         Yes_documents = []
         No_documents = []
         for key, value in query_read.items():
             if value:
-                Yes_documents.append(dictWords[key][0])
+                temp = self.getDocuments(main.dictWords[key][0])
+                Yes_documents.append(x for x in temp)
             else:
-                No_documents.append(dictWords[key][0])
+                temp = self.getDocuments(main.dictWords[key][0])
+                No_documents.append(x for x in temp)
         result = [x for x in Yes_documents if x not in No_documents]
         # devuelve que documentos debemos
         return result
