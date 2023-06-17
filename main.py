@@ -51,7 +51,7 @@ class Spimi():
         except IOError:
             print("Error al cargar el diccionario desde el archivo:", nombre_archivo)
             return None
-        
+
     def loadStopList(self, archivo):
         stoplist = dict()
         with open(archivo, "r", encoding="utf-8") as file:
@@ -59,15 +59,15 @@ class Spimi():
                 palabra = palabra.strip()  # Eliminar espacios en blanco y saltos de línea adicionales
                 stoplist[palabra] = True
         return stoplist
-    
+
     def preProcessing(self, texto):
-        #Tokenizar
+        # Tokenizar
         texto = ' '.join(texto)
         list = nltk.word_tokenize(texto.lower())
 
         stemmer = SnowballStemmer("english")
         result = []
-        #Filtrar stopwords
+        # Filtrar stopwords
         for x in list:
             if (x not in self.stoplist and len(x) > 3):
                 try:
@@ -76,9 +76,8 @@ class Spimi():
                 except ValueError:
                     result.append(stemmer.stem(x))
 
-
         return result
-    
+
     def getFrecuency(self, lista):
         conteo = {}
         for palabra in lista:
@@ -93,24 +92,24 @@ class Spimi():
             errores = 0
             terminosProcesados = 0
             position = 0
-            for counter,line in enumerate(file):
+            for counter, line in enumerate(file):
                 article = json.loads(line)
-                #print("Pos: ", posicion)
+                # print("Pos: ", posicion)
                 inicio = time.time()
-                keyWord = self.preProcessing(   [  article['title'],   article['abstract']   ], self.stoplist)
-                #dictDoc[article['id']] = len(dictDoc)+1
+                keyWord = self.preProcessing([article['title'], article['abstract']], self.stoplist)
+                # dictDoc[article['id']] = len(dictDoc)+1
 
-                self.dictDoc[len(self.dictDoc)+1] = (article['id'],position)
+                self.dictDoc[len(self.dictDoc) + 1] = (article['id'], position)
                 frecuencias = self.getFrecuency(keyWord)
-                terminosProcesados+=len(keyWord)
+                terminosProcesados += len(keyWord)
                 ite = set(keyWord)
-                #Guardar cada Keyword en el memoria secundaria
+                # Guardar cada Keyword en el memoria secundaria
                 for word in list(ite):
-                    if(word in self.dictWord):
-                        #La palabra ya existe en el diccionario
-                        #Se actualiza la frecuencia de documento
+                    if (word in self.dictWord):
+                        # La palabra ya existe en el diccionario
+                        # Se actualiza la frecuencia de documento
                         current = self.dictWord[word]
-                        self.dictWord[word] = (current[0], (current[1]+1))
+                        self.dictWord[word] = (current[0], (current[1] + 1))
                         nameFile = "indexData/" + str(current[0]) + ".txt"
                         try:
                             indexFile = open(nameFile, "a")
@@ -120,8 +119,8 @@ class Spimi():
                             errores += 1
                             print("Error al abrir el archivo:", nameFile)
                     else:
-                        #La palabra es nueva en el diciconario
-                        #Se anade un nuevo valor al diccionario
+                        # La palabra es nueva en el diciconario
+                        # Se anade un nuevo valor al diccionario
                         self.dictWord[word] = (len(self.dictWord) + 1, 1)
                         nameFile = "indexData/" + str(len(self.dictWord)) + ".txt"
                         try:
@@ -129,50 +128,30 @@ class Spimi():
                             indexFile.write(str(len(self.dictDoc)) + ",")
                             indexFile.close()
                         except IOError:
-                            errores+=1
+                            errores += 1
                             print("Error al crear el archivo:", nameFile)
                 tiempo_ejecucion = time.time() - inicio
                 print(f"Se ha cargado: '{article['id']}, correctamente en {tiempo_ejecucion:.6f} segundos. #{counter}")
-                position+=len(line)
+                position += len(line)
                 print("Pos: ", position)
-                if(counter == 1000000):
+                if (counter == 1000000):
                     print("Se termino de procesar")
                     break
 
         print(f"Se ha procesado: {terminosProcesados} palabras durante esta indexacion.")
         print(f"Durante la ejecuccion se anoto: {errores} errores.")
 
-def test(file):
-    sum = 0
-    sum2 = 0
-    sumlist = []
-    stoplist = loadStopList("stoplist-en.txt")
-    
-    with open(file, 'r', encoding="utf-8") as file:
-        for line in file:
-            article = json.loads(line)
-            inicio = time.time()
-            sum2 = sum2 + len(article['title']) + len(article['abstract'])
-            keyWord = preProcessing([article['title'], article['abstract']], stoplist)
-            sum+=len(keyWord)
-            sumlist += keyWord
-            print(keyWord)
-    print(sum2)
-    print(sum)
-    print(len(set(sumlist)))
 
 dictWords = {}
 dictDocs = {}
 saveDict(dictWords, "dictWord.txt", "texto")
-saveDict(dictDocs, "dictDocs.txt","texto")
+saveDict(dictDocs, "dictDocs.txt", "texto")
 
-dictWords = loadDict("dictWord.txt","texto")
-dictDocs = loadDict("dictDocs.txt","texto")
+dictWords = loadDict("dictWord.txt", "texto")
+dictDocs = loadDict("dictDocs.txt", "texto")
 
+indexNewDocuments('part1.json', dictDocs, dictWords)
+saveDict(dictWords, "dictWord.txt", "texto")
+saveDict(dictDocs, "dictDocs.txt", "texto")
 
-indexNewDocuments('part1.json',dictDocs, dictWords)
-saveDict(dictWords, "dictWord.txt","texto")
-saveDict(dictDocs, "dictDocs.txt","texto")
-
-
-#test("part1.json")
+# test("part1.json")

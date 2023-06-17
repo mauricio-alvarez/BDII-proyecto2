@@ -63,7 +63,7 @@ class Recovery:
                     No_documents += temp
                 except:
                     continue
-        result = [x for x in Yes_documents if x not in No_documents]
+        result = [int(x) for x in Yes_documents if x not in No_documents]
         # devuelve que documentos debemos
 
         return result
