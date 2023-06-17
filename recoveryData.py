@@ -57,7 +57,6 @@ class Recovery:
             else:
                 temp = self.getDocuments(main.dictWords[key][0])
                 No_documents.append(int(x) for x in temp)
-
         result = [x for x in Yes_documents if x not in No_documents]
         # devuelve que documentos debemos
 
