@@ -63,6 +63,6 @@ def sort_document(indices, query):
     cosine_similary = cosine_similarity(tf_, tf_idf_vector)
     cosine_similary_final = []
     for i in range(len(indices)):
-        cosine_similary_final.append((cosine_similary[i], indices[i]))
-    sorted(cosine_similary_final, reverse=True)
+        cosine_similary_final.append((cosine_similary[0][i], indices[i]))
+    cosine_similary_final.sort(key=lambda x: x[0], reverse=True)
     return cosine_similary_final
