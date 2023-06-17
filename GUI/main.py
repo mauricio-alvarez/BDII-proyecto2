@@ -10,6 +10,10 @@ import sys,os
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from postrgresIndex import Postgre
 
+'''
+al cargar data corremos todo lo de index.py
+al darle click a make queries cargamos los dos diccionarios 
+'''
 class MainWindow(QMainWindow):
   def __init__(self):
     super(MainWindow,self).__init__()
@@ -18,6 +22,7 @@ class MainWindow(QMainWindow):
     self.ui.setupUi(self)
     # Postgres Index
     self.postgres = Postgre()
+
     # Main Window buttons to open other windows
     self.ui.make_queries.clicked.connect(self.query_window)
     self.ui.load_data.clicked.connect(self.load_window)
