@@ -9,26 +9,27 @@ from documentation_window import Ui_Documentation
 import sys,os
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from postrgresIndex import Postgre
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from spimi import Spimi
 
-'''
-al cargar data corremos todo lo de index.py
-al darle click a make queries cargamos los dos diccionarios 
-'''
 class MainWindow(QMainWindow):
   def __init__(self):
     super(MainWindow,self).__init__()
     # Main Window
     self.ui = Ui_MainWindow()
     self.ui.setupUi(self)
-    # Postgres Index
+    # Postgres and Spimi Index
     self.postgres = Postgre()
-
+    self.spimi = Spimi()
     # Main Window buttons to open other windows
     self.ui.make_queries.clicked.connect(self.query_window)
     self.ui.load_data.clicked.connect(self.load_window)
     self.ui.documentation.clicked.connect(self.documentation_window)
 
   def query_window(self):
+    self.spimi.dictWord = self.spimi.loadDict("dictWord.txt","texto")
+    self.spimi.dictDoc = self.spimi.loadDict("dictDocs.txt","texto")
+    
     self.query_window = QMainWindow()
     self.ui_q = Ui_Query()
     self.ui_q.setupUi(self.query_window)
@@ -71,6 +72,17 @@ class MainWindow(QMainWindow):
       self.ui_q.query.setPlaceholderText("FIRST YOU NEED TO Write your Query here AND THEN SELECT A TOP K....")
 
   def load(self):
+    # Set up Spimi
+    dictWords = {}
+    dictDocs = {}
+    dictWords = self.spimi.loadDict("dictWord.txt","texto")
+    dictDocs = self.spimi.loadDict("dictDocs.txt","texto")
+    if self.ui_l.files_path.text() != "":
+      self.spimi.indexNewDocuments(self.ui_l.files_path.text(),dictDocs, dictWords)    
+      self.spimi.saveDict(dictWords, "dictWord.txt","texto")
+      self.spimi.saveDict(dictDocs, "dictDocs.txt","texto")
+    
+    # Set up Postgres
     self.postgres.loadData()
     self.postgres.createIndex(['title', 'abstract'])
 
