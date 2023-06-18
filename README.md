@@ -22,10 +22,8 @@ Contiene un diccionario que asocia el id de documento con la posición en el arc
 Contiene un diccionario que asocia cada keyword con su id y cuantas veces se repite en el documento
 -main.py
 Contiene la clase SPIMI, con la siguiente estructura:
-. init:
-llama a loadStopList.
-. saveDict: 
-Tras crear el indice en memoria secundaria, se guarda el diccionario de palabras y documentos en memoria. Esta función sólo se ejecuta antes de crear el índice invertido.
+init: llama a loadStopList.
+saveDict: Tras crear el indice en memoria secundaria, se guarda el diccionario de palabras y documentos en memoria. Esta función sólo se ejecuta antes de crear el índice invertido.
 . loadDict: 
 Para realizar consultas, necesitamos cargar los diccionarios de palabras y documentos en memoria principal.
 . loadStopList: 
