@@ -43,6 +43,5 @@ La funcion to_tsquery de postgresql recibe como parametro una consulta preproces
 - **recoveryData.py**
 De acuerdo a la consulta procesada se identifican los keywords los cuales se buscan en el diccionario de palabras para asociarlos con su id y recuperar el índice en memoria secundaria. 
 - **stoplist-en.txt**
-Documento con los   
-- **part1.json**
-Muestra para el proyecto con un tamaño de 1 millon de datos
+Documento con los stopwords.
+
