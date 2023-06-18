@@ -45,3 +45,4 @@ De acuerdo a la consulta procesada se identifican los keywords los cuales se bus
 - **stoplist-en.txt**
 Documento con los stopwords.
 
+- **Desarrollo del backend:**
