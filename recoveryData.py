@@ -77,7 +77,7 @@ class Recovery:
         for x in indices:
             temp = main.dictDocs[str(x)][1]
             file = open('part1.json', 'rb')
-            file.seek(temp + 1) if x != 0 else file.seek(temp)
+            file.seek(temp)
             contenido = str(file.readline().decode('utf-8'))
             documents.append(contenido)
             contenido = json.loads(contenido)
