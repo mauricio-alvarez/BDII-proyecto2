@@ -7,12 +7,12 @@
 
 ## ***Introducción:***
 Para el presente proyecto usamos las librerías NLTK importando tokenize, corpus para los stopwords y stem snowball, sklearn importando TfidVectorizer, CountVectorizer, cosine y similarity, y PyQt6 (QtCore, QtGui y QtWidgets) para la interfaz, usando algoritmos de busqueda y recuperación de la información.
-![Imagen de WhatsApp 2023-06-16 a las 17 19 08](https://github.com/mauricio-alvarez/BDII-proyecto2/assets/85258014/45be809c-fc34-4764-9462-2a1e2256164b)
 
-## ***Desarrollo del proyecto:***
 
+## ***Dominio de datos:***
+La base de datos usada en este proyecto consiste de registros de publicaciones académicas por parte de la universidad de Cornell, donde encontramos campos como autores, títulos de artículos, categorías, abstracts y id's para poder ubicarlos en la página de la universidad.
 - **GUI** (Mauricio)
-
+![Imagen de WhatsApp 2023-06-16 a las 17 19 08](https://github.com/mauricio-alvarez/BDII-proyecto2/assets/85258014/45be809c-fc34-4764-9462-2a1e2256164b)
 
 - **Proyecto2.sql**
 Presenta el código para poder levantar la base de datos con las tablas “articles” , “versions” y “authors_parsed”.
@@ -45,4 +45,5 @@ De acuerdo a la consulta procesada se identifican los keywords los cuales se bus
 - **stoplist-en.txt**
 Documento con los stopwords.
 
-- **Desarrollo del backend:**
+- **Archivos generados por el desarrollo del backend:**
+[Descargar archivos](https://drive.google.com/drive/folders/1a20unbmjfS_bZHMhosFUuWpFwGwLTRIz)
