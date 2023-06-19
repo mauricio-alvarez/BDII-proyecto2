@@ -13,8 +13,10 @@ nltk.download('punkt')
 
 class Recovery:
     # Constructor de clase
-    def __init__(self, query):
+    def __init__(self, query, dictWords, dictDocs):
         self.query = query
+        self.dictWords = dictWords
+        self.dictDocs = dictDocs
 
     # Desglozar la query
     def recovery_query(self):
@@ -55,13 +57,13 @@ class Recovery:
         for key, value in query_read.items():
             if value:
                 try:
-                    temp = self.getDocuments(main.dictWords[key][0])
+                    temp = self.getDocuments(self.dictWords[key][0])
                     Yes_documents += temp
                 except:
                     continue
             else:
                 try:
-                    temp = self.getDocuments(main.dictWords[key][0])
+                    temp = self.getDocuments(self.dictWords[key][0])
                     No_documents += temp
                 except:
                     continue
@@ -75,8 +77,9 @@ class Recovery:
         documents = []
         titles = []
         for x in indices:
-            temp = main.dictDocs[str(x)][1]
-            file = open('arxiv-metadata-oai-snapshot.json', 'rb')
+            temp = self.dictDocs[str(x)][1]
+            #arxiv-metadata-oai-snapshot.json
+            file = open('part1.json', 'rb')
             file.seek(temp + 2) if temp != 0 else file.seek(temp)
             contenido = file.readline().decode('utf-8')
             contenido = contenido.replace('\n', ' ').replace('\\', ' ')
@@ -95,7 +98,7 @@ class Recovery:
         tf_ = model_fit.transform([self.query])
         cosine_similary = cosine_similarity(tf_idf_vector, tf_)
         cosine_similary_final = []
-        for i in range(k):
+        for i in range(int(k)):
             try:
                 cosine_similary_final.append((cosine_similary[i][0], titles[i]))
             except:
@@ -105,7 +108,9 @@ class Recovery:
         return cosine_similary_final
 
     def Recovery_data(self, k):
+        start = time.time()
         temp = self.recovery_query()
         aux = self.serach_document(temp)
         result = self.sort_document(aux, k)
-        return result
+        end = time.time()
+        return result, end - start
