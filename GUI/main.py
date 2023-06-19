@@ -62,17 +62,25 @@ class MainWindow(QMainWindow):
       self.clearLayout(self.ui_q.postgres_layout)
       self.clearLayout(self.ui_q.python_layout)
       print("Query: " + self.ui_q.query.toPlainText() + "\n" + "with Top K: " + self.ui_q.top_k.text())
-      #query = self.postgres.process_text(self.ui_q.query.toPlainText())
-      #print(query)
+      query = self.postgres.process_text(self.ui_q.query.toPlainText())
       query_spimi = Recovery(self.ui_q.query.toPlainText(),self.spimi.dictWord,self.spimi.dictDoc)
+      
+      try:
+        result_sql, time_sql = self.postgres.consultQuery(query,self.ui_q.top_k.text())
+      except:
+        result_sql = ["No se encontraron resultados"]
+        time_sql = 0
+      
+      try:
+        result_spimi, time_index = query_spimi.Recovery_data(self.ui_q.top_k.text())
+      except ValueError:
+        result_spimi = ["No se encontraron resultados"]
+        time_index = 0
 
-      #result_sql, time_sql = self.postgres.consultQuery(query,self.ui_q.top_k.text())
-      result_spimi, time_index = query_spimi.Recovery_data(self.ui_q.top_k.text())
-
-      #self.ui_q.addElementsSQL(result_sql)
+      self.ui_q.addElementsSQL(result_sql)
       self.ui_q.addElementSPIMI(result_spimi)
 
-      #self.ui_q.postgre_time.setText("Tiempo de ejecución: " + str(time_sql) + " ms")
+      self.ui_q.postgre_time.setText("Tiempo de ejecución: " + str(time_sql) + " ms")
       self.ui_q.python_time.setText("Tiempo de ejecución: " + str(time_index) + " ms")
       
     else:
