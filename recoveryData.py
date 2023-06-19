@@ -27,14 +27,14 @@ class Recovery:
         stop_words.discard('didn´t')
         stop_words.discard('dont')
         stop_words = [*stop_words]
+        exceptions = ['no', 'don´t', 'doesn´t', 'didn´t', 'dont']
         query_evaluate = [x for x in query if x not in stop_words]
         if len(query_evaluate) == 0:
             raise Exception('this query does not require any information')
         x = 0
         stemmer = SnowballStemmer("english")
         while x < (len(query_evaluate)):
-            if query_evaluate[x] != 'no':
-
+            if query_evaluate[x] not in exceptions:
                 result[stemmer.stem(query_evaluate[x])] = True
                 x = x + 1
             else:
@@ -71,7 +71,7 @@ class Recovery:
         return result
 
     # Sacar Tfidf de los documentos los cuales debemos mostrar
-   def sort_document(self, indices, k):
+    def sort_document(self, indices, k):
         documents = []
         titles = []
         for x in indices:
@@ -83,7 +83,7 @@ class Recovery:
             documents.append(contenido)
 
             try:
-                if(contenido[0] != "{"): contenido= '{' + contenido
+                if contenido[0] != "{": contenido= '{' + contenido
                 contenido = json.loads(contenido)
                 titles.append(contenido["title"])
             except :
@@ -101,6 +101,7 @@ class Recovery:
             except:
                 break
         cosine_similary_final.sort(key=lambda x: x[0], reverse=True)
+
         return cosine_similary_final
 
     def Recovery_data(self, k):
