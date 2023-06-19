@@ -1,4 +1,5 @@
 import json
+from datetime import time
 
 import nltk
 from nltk.stem.snowball import SnowballStemmer
@@ -70,7 +71,7 @@ class Recovery:
         result = [int(x) for x in Yes_documents if x not in No_documents]
         # devuelve que documentos debemos
 
-        return result
+        return list(set(result))
 
     # Sacar Tfidf de los documentos los cuales debemos mostrar
     def sort_document(self, indices, k):
