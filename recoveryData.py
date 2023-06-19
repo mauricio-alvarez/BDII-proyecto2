@@ -77,7 +77,7 @@ class Recovery:
         for x in indices:
             temp = main.dictDocs[str(x)][1]
             file = open('arxiv-metadata-oai-snapshot.json', 'rb')
-            file.seek(temp + 1) if x != 0 else file.seek(temp)
+            file.seek(temp + 2) if temp != 0 else file.seek(temp)
             contenido = file.readline().decode('utf-8')
             contenido = contenido.replace('\n', ' ').replace('\\', ' ')
             documents.append(contenido)
