@@ -71,17 +71,25 @@ class Recovery:
         return result
 
     # Sacar Tfidf de los documentos los cuales debemos mostrar
-    def sort_document(self, indices, k):
+   def sort_document(self, indices, k):
         documents = []
         titles = []
         for x in indices:
             temp = main.dictDocs[str(x)][1]
-            file = open('part1.json', 'rb')
-            file.seek(temp)
-            contenido = str(file.readline().decode('utf-8'))
+            file = open('arxiv-metadata-oai-snapshot.json', 'rb')
+            file.seek(temp + 1) if x != 0 else file.seek(temp)
+            contenido = file.readline().decode('utf-8')
+            contenido = contenido.replace('\n', ' ').replace('\\', ' ')
             documents.append(contenido)
-            contenido = json.loads(contenido)
-            titles.append(contenido["title"])
+
+            try:
+                if(contenido[0] != "{"): contenido= '{' + contenido
+                contenido = json.loads(contenido)
+                titles.append(contenido["title"])
+            except :
+
+                pass
+
         model_fit = TfidfVectorizer()
         tf_idf_vector = model_fit.fit_transform(documents)
         tf_ = model_fit.transform([self.query])
