@@ -11,6 +11,8 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from postrgresIndex import Postgre
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from spimi import Spimi
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from recoveryData import Recovery
 
 class MainWindow(QMainWindow):
   def __init__(self):
@@ -58,16 +60,21 @@ class MainWindow(QMainWindow):
   def searchQuery(self):
     if self.ui_q.top_k.text() != "" and self.ui_q.query.toPlainText() != "":
       self.clearLayout(self.ui_q.postgres_layout)
-      query = self.postgres.process_text(self.ui_q.query.toPlainText())
-      result_sql, time_sql = self.postgres.consultQuery(query,self.ui_q.top_k.text())
-      result_spimi = 0
-      self.ui_q.addElementsSQL(result_sql)
-      self.ui_q.postgre_time.setText("Tiempo de ejecución: " + str(time_sql) + " ms")
-      #self.ui.addElementSPIMI(result_spimi)
-      #self.ui_q.index_time.setText("Tiempo de ejecución: " + str(time_index) + " ms"))
-      
-      
+      self.clearLayout(self.ui_q.python_layout)
       print("Query: " + self.ui_q.query.toPlainText() + "\n" + "with Top K: " + self.ui_q.top_k.text())
+      #query = self.postgres.process_text(self.ui_q.query.toPlainText())
+      #print(query)
+      query_spimi = Recovery(self.ui_q.query.toPlainText(),self.spimi.dictWord,self.spimi.dictDoc)
+
+      #result_sql, time_sql = self.postgres.consultQuery(query,self.ui_q.top_k.text())
+      result_spimi, time_index = query_spimi.Recovery_data(self.ui_q.top_k.text())
+
+      #self.ui_q.addElementsSQL(result_sql)
+      self.ui_q.addElementSPIMI(result_spimi)
+
+      #self.ui_q.postgre_time.setText("Tiempo de ejecución: " + str(time_sql) + " ms")
+      self.ui_q.python_time.setText("Tiempo de ejecución: " + str(time_index) + " ms")
+      
     else:
       self.ui_q.query.setPlaceholderText("FIRST YOU NEED TO Write your Query here AND THEN SELECT A TOP K....")
 
@@ -75,31 +82,31 @@ class MainWindow(QMainWindow):
     # Set up Spimi
     dictWords = {}
     dictDocs = {}
-    dictWords = self.spimi.loadDict("dictWord.txt","texto")
-    dictDocs = self.spimi.loadDict("dictDocs.txt","texto")
+    self.spimi.dictWord = self.spimi.loadDict("dictWord.txt","texto")
+    self.spimi.dictDoc = self.spimi.loadDict("dictDocs.txt","texto")
     if self.ui_l.files_path.text() != "":
-      self.spimi.indexNewDocuments(self.ui_l.files_path.text(),dictDocs, dictWords)    
-      self.spimi.saveDict(dictWords, "dictWord.txt","texto")
-      self.spimi.saveDict(dictDocs, "dictDocs.txt","texto")
+      self.spimi.indexNewDocuments(self.ui_l.files_path.text())    
+      self.spimi.saveDict(self.spimi.dictWord, "dictWord.txt","texto")
+      self.spimi.saveDict(self.spimi.dictDoc, "dictDocs.txt","texto")
     
     # Set up Postgres
-    self.postgres.loadData()
-    self.postgres.createIndex(['title', 'abstract'])
+    if not self.postgres.isFull():
+      self.postgres.loadData(self.ui_l.files_path.text())
+      self.postgres.createIndex(['title', 'abstract'])
 
   def clearLayout(self, layout):
     while layout.count():
       child = layout.takeAt(0)
       if child.widget():
-          child.widget().deleteLater()
+        child.widget().deleteLater()
 
   def show_window(self, win1, win2):
     if win1.isVisible():
-        win1.hide()
-        win2.show()
+      win1.hide()
+      win2.show()
     else:
-        win2.hide()
-        win1.show()
-
+      win2.hide()
+      win1.show()
 
 
 if __name__ == "__main__":

@@ -115,6 +115,14 @@ class Ui_Query(object):
                 self.postgres_layout.addWidget(temp)
             print(n, res)
 
+    def addElementSPIMI(self, result):
+        for n, res in enumerate(result):
+            if n < 10:
+                temp = QtWidgets.QLabel(parent=self.centralwidget)
+                temp.setText(str(res))
+                self.python_layout.addWidget(temp)
+            print(n, res)
+
 if __name__ == "__main__":
     import sys
     app = QtWidgets.QApplication(sys.argv)
