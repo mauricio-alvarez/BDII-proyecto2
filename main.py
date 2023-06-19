@@ -10,14 +10,12 @@ from nltk.tokenize import word_tokenize
 from nltk.corpus import stopwords
 from nltk.stem.snowball import SnowballStemmer
 from nltk.stem.porter import *
-
+nltk.download('punkt')
 
 class Spimi():
     def __init__(self):
         self.dictDoc = self.dictWord = self.stoplist = {}
         self.stoplist = self.loadStopList("stoplist-en.txt")
-        self.dictWord = 0
-        self.dictDoc = 0
 
     def saveDict(self, diccionario, nombre_archivo, formato):
         try:
@@ -96,7 +94,7 @@ class Spimi():
                 article = json.loads(line)
                 # print("Pos: ", posicion)
                 inicio = time.time()
-                keyWord = self.preProcessing([article['title'], article['abstract']], self.stoplist)
+                keyWord = self.preProcessing([article['title'], article['abstract']])
                 # dictDoc[article['id']] = len(dictDoc)+1
 
                 self.dictDoc[len(self.dictDoc) + 1] = (article['id'], position)
@@ -131,17 +129,16 @@ class Spimi():
                             errores += 1
                             print("Error al crear el archivo:", nameFile)
                 tiempo_ejecucion = time.time() - inicio
-                print(f"Se ha cargado: '{article['id']}, correctamente en {tiempo_ejecucion:.6f} segundos. #{counter}")
+                # print(f"Se ha cargado: '{article['id']}, correctamente en {tiempo_ejecucion:.6f} segundos. #{counter}")
                 position += len(line)
-                print("Pos: ", position)
+                # print("Pos: ", position)
                 if (counter == 1000000):
                     print("Se termino de procesar")
                     break
 
         print(f"Se ha procesado: {terminosProcesados} palabras durante esta indexacion.")
         print(f"Durante la ejecuccion se anoto: {errores} errores.")
-
-
+'''
 dictWords = {}
 dictDocs = {}
 saveDict(dictWords, "dictWord.txt", "texto")
@@ -153,5 +150,5 @@ dictDocs = loadDict("dictDocs.txt", "texto")
 indexNewDocuments('part1.json', dictDocs, dictWords)
 saveDict(dictWords, "dictWord.txt", "texto")
 saveDict(dictDocs, "dictDocs.txt", "texto")
-
+'''
 # test("part1.json")
