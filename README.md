@@ -11,9 +11,11 @@ Para el presente proyecto usamos las librerías NLTK importando tokenize, corpus
 
 ## ***Dominio de datos:***
 La base de datos usada en este proyecto consiste de registros de publicaciones académicas por parte de la universidad de Cornell, donde encontramos campos como autores, títulos de artículos, categorías, abstracts y id's para poder ubicarlos en la página de la universidad.
-- **GUI** (Mauricio)
+
+## **GUI** (Frontend)
 ![Imagen de WhatsApp 2023-06-16 a las 17 19 08](https://github.com/mauricio-alvarez/BDII-proyecto2/assets/85258014/45be809c-fc34-4764-9462-2a1e2256164b)
 
+## ***Dominio de datos:*** (Backend)
 - **Proyecto2.sql**
 Presenta el código para poder levantar la base de datos con las tablas “articles” , “versions” y “authors_parsed”.
 - **dictDocs.txt**
