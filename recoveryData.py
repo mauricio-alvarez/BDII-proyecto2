@@ -1,3 +1,5 @@
+import json
+
 import nltk
 from nltk.stem.snowball import SnowballStemmer
 from nltk.corpus import stopwords
@@ -69,28 +71,29 @@ class Recovery:
         return result
 
     # Sacar Tfidf de los documentos los cuales debemos mostrar
-    def sort_document(self, indices):
+    def sort_document(self, indices, k):
         documents = []
-        jsonpos = []
+        titles = []
         for x in indices:
             temp = main.dictDocs[str(x)][1]
-            jsonpos.append(temp)
             file = open('part1.json', 'rb')
             file.seek(temp + 1) if x != 0 else file.seek(temp)
             contenido = str(file.readline().decode('utf-8'))
             documents.append(contenido)
+            contenido = json.loads(contenido)
+            titles.append(contenido["title"])
         model_fit = TfidfVectorizer()
         tf_idf_vector = model_fit.fit_transform(documents)
         tf_ = model_fit.transform([self.query])
         cosine_similary = cosine_similarity(tf_idf_vector, tf_)
         cosine_similary_final = []
         for i in range(len(indices)):
-            cosine_similary_final.append((cosine_similary[i][0], jsonpos[i]))
+            cosine_similary_final.append((cosine_similary[i][0], titles[i]))
         cosine_similary_final.sort(key=lambda x: x[0], reverse=True)
         return cosine_similary_final
 
-    def Recovery_data(self):
+    def Recovery_data(self, k):
         temp = self.recovery_query()
         aux = self.serach_document(temp)
-        result = self.sort_document(aux)
+        result = self.sort_document(aux, k)
         return result
