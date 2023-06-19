@@ -87,8 +87,11 @@ class Recovery:
         tf_ = model_fit.transform([self.query])
         cosine_similary = cosine_similarity(tf_idf_vector, tf_)
         cosine_similary_final = []
-        for i in range(len(indices)):
-            cosine_similary_final.append((cosine_similary[i][0], titles[i]))
+        for i in range(k):
+            try:
+                cosine_similary_final.append((cosine_similary[i][0], titles[i]))
+            except:
+                break
         cosine_similary_final.sort(key=lambda x: x[0], reverse=True)
         return cosine_similary_final
 
