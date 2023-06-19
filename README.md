@@ -46,4 +46,4 @@ De acuerdo a la consulta procesada se identifican los keywords los cuales se bus
 Documento con los stopwords.
 
 - **Archivos generados por el desarrollo del backend:**
-![Descargar archivos](https://drive.google.com/drive/folders/1a20unbmjfS_bZHMhosFUuWpFwGwLTRIz)
+[Descargar archivos](https://drive.google.com/drive/folders/1a20unbmjfS_bZHMhosFUuWpFwGwLTRIz)
