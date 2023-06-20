@@ -89,7 +89,7 @@ class Recovery:
                 titles.append(contenido["title"])
                 documents.append(contenido['authors'] + contenido['title'] + ' ' + contenido['abstract'] + contenido['comments'])
             except:
-                print("Some error Uppss!!!")
+                print("Error tipo 1 ")
                 pass
 
 
