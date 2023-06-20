@@ -100,15 +100,11 @@ class Recovery:
         cosine_similary_final = []
         cosine_similary_temp = []
         for i in range(len(titles)):
-            try:
-                cosine_similary_temp.append((cosine_similary[i][0], titles[i]))
-            except:
-                break
+            cosine_similary_temp.append((cosine_similary[i][0], titles[i]))
         cosine_similary_temp.sort(key=lambda x: x[0], reverse=True)
-        cosine_similarity_final = []
         for i in range(int(k)):
             try:
-                cosine_similarity_final.append(cosine_similary_temp[i])
+                cosine_similary_final.append(cosine_similary_temp[i])
             except:
                 break
         return cosine_similary_final
