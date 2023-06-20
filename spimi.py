@@ -76,14 +76,7 @@ class Spimi():
         print(result)
         return result
 
-    def getFrecuency(self, lista):
-        conteo = {}
-        for palabra in lista:
-            if palabra in conteo:
-                conteo[palabra] += 1
-            else:
-                conteo[palabra] = 1
-        return conteo
+   
 
     def indexNewDocuments(self, file):
         with open(file, 'r', encoding="utf-8") as file:
@@ -98,7 +91,7 @@ class Spimi():
                 # dictDoc[article['id']] = len(dictDoc)+1
 
                 self.dictDoc[len(self.dictDoc) + 1] = (article['id'], position)
-                frecuencias = self.getFrecuency(keyWord)
+               
                 terminosProcesados += len(keyWord)
                 ite = set(keyWord)
                 # Guardar cada Keyword en el memoria secundaria
