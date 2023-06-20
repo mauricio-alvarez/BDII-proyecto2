@@ -6,7 +6,6 @@ from nltk.stem.snowball import SnowballStemmer
 from nltk.corpus import stopwords
 from sklearn.feature_extraction.text import TfidfVectorizer, CountVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
-import spimi
 
 nltk.download('stopwords')
 nltk.download('punkt')
@@ -52,7 +51,7 @@ class Recovery:
         result = text.split(',')
         return result[:-1]
 
-    def serach_document(self, query_read):
+    def search_document(self, query_read):
         Yes_documents = []
         No_documents = []
         for key, value in query_read.items():
@@ -80,7 +79,7 @@ class Recovery:
         for x in indices:
             temp = self.dictDocs[str(x)][1]
             # arxiv-metadata-oai-snapshot.json
-            file = open('part1.json', 'rb')
+            file = open('arxiv-metadata-oai-snapshot.json', 'rb')
             file.seek(temp + 2) if temp != 0 else file.seek(temp)
             contenido = file.readline().decode('utf-8')
             contenido = contenido.replace('\n', ' ').replace('\\', ' ')
@@ -107,7 +106,7 @@ class Recovery:
                 break
         cosine_similary_temp.sort(key=lambda x: x[0], reverse=True)
         cosine_similarity_final = []
-        for i in range(k):
+        for i in range(int(k)):
             try:
                 cosine_similarity_final.append(cosine_similary_temp[i])
             except:
@@ -117,7 +116,7 @@ class Recovery:
     def Recovery_data(self, k):
         start = time.time()
         temp = self.recovery_query()
-        aux = self.serach_document(temp)
+        aux = self.search_document(temp)
         result = self.sort_document(aux, k)
         end = time.time()
         return result, end - start
