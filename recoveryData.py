@@ -48,7 +48,7 @@ class Recovery:
 
     def getDocuments(self, pos):
         file = open('indexData/' + str(pos) + '.txt')
-        text = file.readline()
+        text = file.read()
         result = text.split(',')
         return result[:-1]
 
@@ -79,7 +79,7 @@ class Recovery:
         titles = []
         for x in indices:
             temp = self.dictDocs[str(x)][1]
-            #arxiv-metadata-oai-snapshot.json
+            # arxiv-metadata-oai-snapshot.json
             file = open('part1.json', 'rb')
             file.seek(temp + 2) if temp != 0 else file.seek(temp)
             contenido = file.readline().decode('utf-8')
@@ -87,10 +87,10 @@ class Recovery:
             documents.append(contenido)
 
             try:
-                if contenido[0] != "{": contenido= '{' + contenido
+                if contenido[0] != "{": contenido = '{' + contenido
                 contenido = json.loads(contenido)
                 titles.append(contenido["title"])
-            except :
+            except:
 
                 pass
 
