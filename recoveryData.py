@@ -73,7 +73,7 @@ class Recovery:
         return list(set(result))
 
     # Sacar Tfidf de los documentos los cuales debemos mostrar
-    def sort_document(self, indices, k):
+        def sort_document(self, indices, k):
         documents = []
         titles = []
         for x in indices:
@@ -83,15 +83,15 @@ class Recovery:
             file.seek(temp + 2) if temp != 0 else file.seek(temp)
             contenido = file.readline().decode('utf-8')
             contenido = contenido.replace('\n', ' ').replace('\\', ' ')
-            documents.append(contenido)
-
+            contenido = self.tojson(contenido)
+            
             try:
-                if contenido[0] != "{": contenido = '{' + contenido
-                contenido = json.loads(contenido)
                 titles.append(contenido["title"])
+                documents.append(contenido['authors'] + contenido['title'] + ' ' + contenido['abstract'] + contenido['comments'])
             except:
-
+                print("Some error Uppss!!!")
                 pass
+
 
         model_fit = TfidfVectorizer()
         tf_idf_vector = model_fit.fit_transform(documents)
@@ -106,9 +106,44 @@ class Recovery:
             try:
                 cosine_similary_final.append(cosine_similary_temp[i])
             except:
+
                 break
         return cosine_similary_final
-
+    def tojson(self, contenido):
+        keysToFind = {
+            0: ("id", 5), 1: ("submitter", 12), 2: ("authors", 10),3: ("title", 8),
+            4: ("comments", 11),5: ("journal-ref", 14),6: ("doi", 6),7: ("report-no", 12),
+            8: ("categories", 13),9: ("license", 10),
+            10: ("abstract", 11),11: ("versions", 11),
+            12: ("update_date", 14),13: ("authors_parsed", 17)
+        }
+        patrones = [
+            '"authors":', '"title":', '"comments":',
+            '"journal-ref":','"abstract":', '"versions":']
+        newDict = dict()
+        expresion_regular = "|".join(patrones)
+        coincidencias = re.finditer(expresion_regular, contenido)
+        posiciones = [coincidencia.start() for coincidencia in coincidencias]
+        if (len(patrones) == len(posiciones)):
+            #Agregar authors
+            newDict['authors'] = contenido[posiciones[0] + keysToFind[0][1]:posiciones[1] - 2]
+            #Agregar title
+            newDict['title'] = contenido[posiciones[1] + keysToFind[1][1]:posiciones[2] - 2]
+            #Agregar comments
+            newDict['comments'] = contenido[posiciones[2] + keysToFind[2][1]:posiciones[3] - 2]
+            #Agregar abstract
+            newDict['abstract'] = contenido[posiciones[4] + keysToFind[4][1]:posiciones[5] - 2]
+        else:
+            print(posiciones)
+            try:return json.load(contenido)
+            except:
+                print("Some error 2 Uppss!!!")
+                newDict['authors'] = ""
+                newDict['title'] = ""
+                newDict['comments'] = ""
+                newDict['abstract'] = ""
+        return newDict
+        
     def Recovery_data(self, k):
         start = time.time()
         temp = self.recovery_query()
