@@ -1,6 +1,8 @@
 import psycopg2
 import json
 import nltk
+from nltk.tokenize import word_tokenize
+from nltk.stem.snowball import SnowballStemmer
 import time
 from nltk.corpus import stopwords
 nltk.download('stopwords')
@@ -96,28 +98,41 @@ class Postgre():
         self.closeConnection()
         # run this with this command 
         # createIndex(["title", "abstract"])
+    def loadStopList(archivo):
+        stoplist = dict()
+        with open(archivo, "r", encoding="utf-8") as file:
+            for palabra in file:
+                palabra = palabra.strip()  # Eliminar espacios en blanco y saltos de línea adicionales
+                stoplist[palabra] = True
+        return stoplist
 
 
-    def process_text(self, text):
-        operators = ['and', 'or', 'not', 'also', 'too', 'either']
-        operator_map = {'and': '&', 'or': '|', 'not': '!', 'also': '&', 'too': '&', 'either': '|'}
-        default_operator = '|'
-        stop_words = set(stopwords.words('english'))
-        words = text.split()
-        processed_words = []
-        for i, word in enumerate(words):
-            if word.lower() in operators:
-                if word.lower() == 'not':
-                    if processed_words and processed_words[-1] not in operator_map.values():
-                        processed_words.append('&')
-                    processed_words.append(operator_map[word.lower()])
-                elif word.lower() != 'not' and (i == 0 or words[i-1].lower() != 'not'):
-                    processed_words.append(operator_map[word.lower()])
-            elif word.lower() not in stop_words:
-                if i > 0 and words[i-1].lower() not in operators and words[i-1].lower() not in stop_words:
-                    processed_words.append(default_operator)
-                processed_words.append(word.lower())
-        return ' '.join(processed_words)
+    def process_text(text, stopwords):
+        booleanTerms = {"and": "&", "also": "&", "as well as": "&", "in adtition": "&", "moreover": "&", "furthermore": "&", "likewise": "&", "too":"&", "additionally":"&",
+        "not": "! &", "no":"! &", "neither": "! &", "nor":"! &"}
+        queryResult = ""
+        stemmer = SnowballStemmer("english")
+        text = text.lower()
+        for word in text.split():
+            if (word in stopwords and word in booleanTerms):
+                queryResult+= stemmer.stem(word) + " "
+            elif (word not in stopwords or word in booleanTerms):
+                queryResult+= stemmer.stem(word) + " "
+        text = queryResult
+        queryResult = ""
+        stemmer = SnowballStemmer("english")
+        for i, word in enumerate(text.split()):
+            if(word not in booleanTerms):
+                if(i != len(text.split()) - 1): 
+                    queryResult+= word + " | " 
+                else: queryResult+= word
+            else:
+              if(queryResult[-2:-1] == "|" and i != len(text.split()) - 1):
+                  queryResult = queryResult[:-2] + booleanTerms[word] + " "
+              else: queryResult+= word
+        #Proecesamiento de stopwords
+    
+        return queryResult
 
     def consultQuery(self, query, k):
         start_time = time.time()
@@ -142,6 +157,6 @@ class Postgre():
 '''postgre = Postgre()
 postgre.loadData("s")
 postgre.createIndex(['title', 'abstract'])
-processed_text = postgre.process_text("human rights and politics not also in uk")
+processed_text = postgre.process_text("human rights and politics not also in uk", loadStopList("stoplist-en.txt"))
 list = postgre.consultQuery(processed_text,10)
 print(list)'''
