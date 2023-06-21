@@ -5,6 +5,8 @@
 - Rodo Vilcarromero
 - Ronaldo Flores
 
+-[Video de presentación:](https://drive.google.com/drive/folders/1BHmU0a5xmGE4y1shGJd6BG4lsvnW6ZKw)
+
 ## ***Introducción:***
 Para el presente proyecto usamos las librerías NLTK importando tokenize, corpus para los stopwords y stem snowball, sklearn importando TfidVectorizer, CountVectorizer, cosine y similarity, y PyQt6 (QtCore, QtGui y QtWidgets) para la interfaz, usando algoritmos de busqueda y recuperación de la información.
 
